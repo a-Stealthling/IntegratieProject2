@@ -48,8 +48,14 @@ public class SecurityConfiguration {
     public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
         protected void configure(HttpSecurity http) throws Exception {
-
             http.authorizeRequests()
+                    .antMatchers(HttpMethod.GET, "/api/**").permitAll()
+                    .antMatchers(HttpMethod.POST, "/api/**").permitAll()
+                    .and()
+                    .csrf()
+                    .disable();
+
+           /* http.authorizeRequests()
 //                    .antMatchers(HttpMethod.POST, "/api/login").permitAll()
 //                    .antMatchers(HttpMethod.GET, "/api/logout").authenticated()
                     .antMatchers(HttpMethod.GET, "/api/").permitAll()
@@ -85,7 +91,7 @@ public class SecurityConfiguration {
                     })
                     .and()
                     .csrf()
-                    .disable();
+                    .disable();*/
         }
     }
 }
