@@ -1,6 +1,7 @@
 package be.kdg.kandoe.dto;
 
 import be.kdg.kandoe.domain.theme.Theme;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 
@@ -8,15 +9,15 @@ import javax.persistence.*;
  * Mediate Object-class to translate JSON-objects to Theme-objects
  */
 @Entity
-@Table
+@Table(name = "THEME")
 public class ThemeDto {
-    @Column
+    @Column(name = "theme_id")
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long themeId;
-    @Column
+    @Column(name = "name")
     private String name;
-    @Column
+    @Column(name = "description")
     private String description;
 
     public ThemeDto(){
@@ -51,9 +52,6 @@ public class ThemeDto {
         return themeId;
     }
 
-    public void setThemeId(long themeId) {
-        this.themeId = themeId;
-    }
 
 
 }

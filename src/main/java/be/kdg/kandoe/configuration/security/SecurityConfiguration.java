@@ -54,7 +54,6 @@ public class SecurityConfiguration {
                     .and()
                     .csrf()
                     .disable();
-
            /* http.authorizeRequests()
 //                    .antMatchers(HttpMethod.POST, "/api/login").permitAll()
 //                    .antMatchers(HttpMethod.GET, "/api/logout").authenticated()

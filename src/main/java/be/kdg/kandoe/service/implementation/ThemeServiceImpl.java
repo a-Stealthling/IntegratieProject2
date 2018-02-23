@@ -5,24 +5,24 @@ import be.kdg.kandoe.repository.declaration.ThemeRepository;
 import be.kdg.kandoe.service.declaration.ThemeService;
 import be.kdg.kandoe.service.exception.InputValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import javax.inject.Named;
 import java.util.List;
 
-@Named
+@Service
 public class ThemeServiceImpl implements ThemeService {
 
-    private final ThemeRepository themeRepo;
+    private ThemeRepository themeRepo;
 
-    public ThemeServiceImpl(ThemeRepository themeRepo){
-        this.themeRepo = themeRepo;
+    @Autowired
+    public ThemeServiceImpl(ThemeRepository repository){
+        this.themeRepo=repository;
     }
 
     @Override
     public Theme addTheme(Theme theme1) {
         if(checkNameLength(theme1)) {
-            themeRepo.createTheme(theme1);
-            return theme1;
+            return themeRepo.createTheme(theme1);
         } else {
             throw new InputValidationException("Theme name too long");
         }
@@ -39,17 +39,17 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     public Theme editTheme(Theme theme) {
-        if (checkNameLength(theme)) return themeRepo.editTheme(theme);
+        if (checkNameLength(theme)) return themeRepo.editTheme(theme.getThemeId(),theme.getName(),theme.getDescription());
         throw new InputValidationException("Themename too long");
     }
     @Override
     public Theme removeTheme(Theme themeToDelete) {
-        return themeRepo.deleteTheme(themeToDelete);
+        return themeRepo.deleteThemeByThemeId(themeToDelete.getThemeId());
     }
 
     @Override
     public Theme removeThemeById(long themeId) {
-        return themeRepo.deleteThemeById(themeId);
+        return themeRepo.deleteThemeByThemeId(themeId);
     }
 
     @Override

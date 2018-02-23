@@ -7,6 +7,9 @@ public class Theme {
     private String name;
     private String description;
 
+    public Theme(){
+
+    }
     public Theme(ThemeDto themeDto){
         this.themeId=themeDto.getThemeId();
         this.name=themeDto.getName();
