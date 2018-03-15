@@ -74,10 +74,24 @@ public class ThemeRepositoryImpl implements ThemeRepository {
 
     @Transactional
     @Override
+    public ThemeJpa createThemeNoConvert(ThemeJpa theme) {
+        em.persist(theme);
+        return theme;
+    }
+
+    @Transactional
+    @Override
     public SubTheme createSubTheme(SubTheme subTheme) {
         SubThemeJpa jpa = SubThemeJpa.fromSubTheme(subTheme);
         SubThemeJpa reply = em.merge(jpa);;
         return reply.toSubTheme();
+    }
+
+    @Override
+    @Transactional
+    public SubThemeJpa createSubThemeNoConvert(SubThemeJpa subThemeJpa) {
+        em.persist(subThemeJpa);
+        return subThemeJpa;
     }
 
     @Transactional

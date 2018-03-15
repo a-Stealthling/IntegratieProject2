@@ -2,6 +2,7 @@ package be.kdg.kandoe.domain;
 
 import be.kdg.kandoe.domain.user.User;
 import be.kdg.kandoe.dto.gameSession.CreateGameSessionDto;
+import be.kdg.kandoe.repository.jpa.ThemeJpa;
 import org.hibernate.annotations.Fetch;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -41,13 +42,16 @@ public class GameSession {
     private String title; //GameTitle
 
     @Column(nullable = false)
-    @OneToMany(targetEntity = UserGameSessionInfo.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "gameSession")
+    @OneToMany(targetEntity = UserGameSessionInfo.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "gameSession", orphanRemoval = true)
     @Fetch(org.hibernate.annotations.FetchMode.SELECT)
     private List<UserGameSessionInfo> userGameSessionInfos = new ArrayList<>();
 
     @Column
     private String image = "default-session.png";
 
+    @ManyToOne
+    @JoinColumn(name = "session_themeId_PK")
+    private ThemeJpa themeForSession;
 
     public GameSession() {
     }
@@ -73,6 +77,10 @@ public class GameSession {
         UserGameSessionInfo userGameSessionInfo = new UserGameSessionInfo(getDefaultNotifications(), false, GameSessionRole.Participant, user, this);
         this.userGameSessionInfos.add(userGameSessionInfo);
         return userGameSessionInfo;
+    }
+
+    public void removeUserFromGameSession(UserGameSessionInfo userGameSessionInfo){
+        this.userGameSessionInfos.remove(userGameSessionInfo);
     }
 
     private List<Notification> getDefaultNotifications(){
@@ -217,5 +225,13 @@ public class GameSession {
             }
         }
         return subOrganisators;
+    }
+
+    public ThemeJpa getThemeForSession() {
+        return themeForSession;
+    }
+
+    public void setThemeForSession(ThemeJpa themeForSession) {
+        this.themeForSession = themeForSession;
     }
 }

@@ -1,5 +1,9 @@
 package be.kdg.kandoe.dto.gameSession;
 
+import be.kdg.kandoe.domain.GameSession;
+import be.kdg.kandoe.dto.ThemeDto;
+import be.kdg.kandoe.repository.jpa.ThemeJpa;
+
 import java.util.List;
 
 public class CreateGameSessionDto {
@@ -11,9 +15,9 @@ public class CreateGameSessionDto {
     private int selectionLimit;
     private int timer; //Turn length
     private Long gameSessionId;
-
-    //test
     private List<String> subOrganisators;
+
+    private ThemeDto themeForSession;
 
     public CreateGameSessionDto() {
     }
@@ -28,6 +32,17 @@ public class CreateGameSessionDto {
         this.timer = timer;
     }
 
+    public CreateGameSessionDto(String title, String organisator, boolean isOrganisatorPlaying, boolean allowUsersToAdd, int limit, int selectionLimit, int timer, ThemeDto themeForSession) {
+        this.title = title;
+        this.organisator = organisator;
+        this.isOrganisatorPlaying = isOrganisatorPlaying;
+        this.allowUsersToAdd = allowUsersToAdd;
+        this.limit = limit;
+        this.selectionLimit = selectionLimit;
+        this.timer = timer;
+        this.themeForSession = themeForSession;
+    }
+
     public CreateGameSessionDto(String title, String organisator, boolean isOrganisatorPlaying, boolean allowUsersToAdd, int limit, int selectionLimit, int timer, List<String> subOrganisators) {
         this.title = title;
         this.organisator = organisator;
@@ -37,6 +52,18 @@ public class CreateGameSessionDto {
         this.selectionLimit = selectionLimit;
         this.timer = timer;
         this.subOrganisators = subOrganisators;
+    }
+
+    public CreateGameSessionDto(String title, String organisator, boolean isOrganisatorPlaying, boolean allowUsersToAdd, int limit, int selectionLimit, int timer, List<String> subOrganisators, ThemeDto themeForSession) {
+        this.title = title;
+        this.organisator = organisator;
+        this.isOrganisatorPlaying = isOrganisatorPlaying;
+        this.allowUsersToAdd = allowUsersToAdd;
+        this.limit = limit;
+        this.selectionLimit = selectionLimit;
+        this.timer = timer;
+        this.subOrganisators = subOrganisators;
+        this.themeForSession = themeForSession;
     }
 
     public String getTitle() {
@@ -114,5 +141,14 @@ public class CreateGameSessionDto {
     public void setSubOrganisators(List<String> subOrganisators) {
         this.subOrganisators = subOrganisators;
     }
+
+    public ThemeDto getthemeForSession() {
+        return themeForSession;
+    }
+
+    public void setthemeForSession(ThemeDto themeForSession) {
+        this.themeForSession = themeForSession;
+    }
+
 }
 

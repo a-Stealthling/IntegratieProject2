@@ -3,6 +3,8 @@ package be.kdg.kandoe.service.implementation;
 import be.kdg.kandoe.domain.theme.SubTheme;
 import be.kdg.kandoe.domain.theme.Theme;
 import be.kdg.kandoe.repository.declaration.ThemeRepository;
+import be.kdg.kandoe.repository.jpa.SubThemeJpa;
+import be.kdg.kandoe.repository.jpa.ThemeJpa;
 import be.kdg.kandoe.service.declaration.ThemeService;
 import be.kdg.kandoe.service.exception.InputValidationException;
 import be.kdg.kandoe.service.exception.ThemeServiceException;
@@ -35,11 +37,23 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
+    public ThemeJpa addThemeNoConvert(ThemeJpa theme) {
+       return themeRepo.createThemeNoConvert(theme);
+    }
+
+    @Override
     public SubTheme addSubThemeByThemeId(SubTheme subTheme,long themeId) {
         Theme themeToAdd=themeRepo.findThemeById(themeId);
         subTheme.setTheme(themeToAdd);
         return themeRepo.createSubTheme(subTheme);
     }
+
+    @Override
+    public SubThemeJpa addSubThemeByIdNoConvert(SubThemeJpa subThemeJpa, long themeId) {
+        //entityManager.getReference(..., ...); --> Eigenlijk beter want dan moet er geen call naar de db gemaakt worden
+        return themeRepo.createSubThemeNoConvert(subThemeJpa);
+    }
+
     //ADD-METHODS
     //GET-METHODS
     @Override
@@ -50,6 +64,9 @@ public class ThemeServiceImpl implements ThemeService {
         }
         return themeToFind;
     }
+
+
+
 
     @Override
     public Theme getThemeById(long id) {

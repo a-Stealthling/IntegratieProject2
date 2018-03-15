@@ -57,7 +57,7 @@ public class User implements UserDetails {
 
 
     @Column
-    @OneToMany(targetEntity = UserGameSessionInfo.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
+    @OneToMany(targetEntity = UserGameSessionInfo.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user", orphanRemoval = true)
     @Fetch(org.hibernate.annotations.FetchMode.SELECT)
     private List<UserGameSessionInfo> gameSessionInfos = new ArrayList<>();
 
@@ -246,5 +246,9 @@ public class User implements UserDetails {
 
     public void setProfilePictureFileName(String profilePictureFileName) {
         this.profilePictureFileName = profilePictureFileName;
+    }
+
+    public void removeUserGameSessionInfo(UserGameSessionInfo userGameSessionInfo){
+        this.getGameSessionInfos().remove(userGameSessionInfo);
     }
 }

@@ -32,10 +32,12 @@ public class SubThemeJpa {
     public SubThemeJpa(){
 
     }
+
+
     public SubThemeJpa(SubTheme subTheme){
-        if(subTheme.getTheme()!=null){
-            this.theme=ThemeJpa.fromTheme(subTheme.getTheme());
-        }
+//        if(subTheme.getTheme()!=null){
+//            this.theme=ThemeJpa.fromTheme(subTheme.getTheme());
+//        }
         this.subThemeName=subTheme.getSubThemeName();
         this.subThemeDescription=subTheme.getSubThemeDescription();
     }
@@ -50,6 +52,10 @@ public class SubThemeJpa {
 
     public void setTheme(Theme theme) {
         this.theme = ThemeJpa.fromTheme(theme);
+    }
+
+    public void setThemeNoConvert(ThemeJpa theme){
+        this.theme = theme;
     }
 
     public String getSubThemeName() {
@@ -74,8 +80,10 @@ public class SubThemeJpa {
 
     public SubTheme toSubTheme(){
         SubTheme subTheme = new SubTheme();
-        if(this.theme!=null){
+        boolean called = false;
+        if(this.theme!=null && !called){
             subTheme.setTheme(this.theme.toTheme());
+            called = true;
         }
         subTheme.setSubThemeId(this.subThemeId);
         subTheme.setSubThemeName(this.subThemeName);

@@ -1,12 +1,18 @@
 package be.kdg.kandoe.controller.rest;
 
+import be.kdg.kandoe.domain.GameSession;
 import be.kdg.kandoe.domain.theme.SubTheme;
 import be.kdg.kandoe.domain.theme.Theme;
+import be.kdg.kandoe.domain.user.User;
 import be.kdg.kandoe.dto.DtoConverter;
 import be.kdg.kandoe.dto.SubThemeDto;
 import be.kdg.kandoe.dto.ThemeDto;
 import be.kdg.kandoe.repository.implementation.ThemeRepositoryImpl;
+import be.kdg.kandoe.repository.jpa.ThemeJpa;
+import be.kdg.kandoe.service.declaration.AuthenticationHelperService;
+import be.kdg.kandoe.service.declaration.GameSessionService;
 import be.kdg.kandoe.service.declaration.ThemeService;
+import be.kdg.kandoe.service.declaration.UserService;
 import be.kdg.kandoe.service.exception.ThemeServiceException;
 import be.kdg.kandoe.service.implementation.ThemeServiceImpl;
 import com.sun.org.apache.regexp.internal.RE;
@@ -19,8 +25,10 @@ import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.xml.ws.Response;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +38,15 @@ public class ThemeRestController {
     private final Logger logger = Logger.getLogger(ThemeRestController.class);
 
     private ThemeService themeService;
+
+    @Autowired
+    private AuthenticationHelperService authenticationHelperService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private GameSessionService gameSessionService;
 
     public ThemeRestController(ThemeService themeService){
         this.themeService=themeService;
@@ -125,7 +142,9 @@ public class ThemeRestController {
         }
         System.out.println("CALL RECEICED: CreateSubTheme");
         logger.log(Priority.INFO,"API CALL: CreateSubTheme");
+
         SubTheme createdSubTheme = themeService.addSubThemeByThemeId(subThemeDto.toSubTheme(),themeId);
+
         if(createdSubTheme!=null){
             return ResponseEntity.ok().body(SubThemeDto.fromSubTheme(createdSubTheme));
         }else{
@@ -140,6 +159,7 @@ public class ThemeRestController {
     public ResponseEntity<ThemeDto> updateTheme(@PathVariable Long themeId, @Valid @RequestBody ThemeDto theme){
         System.out.println("CALL RECEIVED: updateTheme: "+themeId);
         logger.log(Priority.INFO,"API CALL: updateTheme: "+themeId);
+
         Theme foundTheme = themeService.getThemeById(themeId);
         if(foundTheme == null){
             logger.log(Priority.ERROR,"No theme found for Id: "+themeId);
@@ -148,6 +168,7 @@ public class ThemeRestController {
         foundTheme.setDescription(theme.getDescription());
         foundTheme.setName(theme.getName());
         Theme updatedTheme=themeService.editTheme(foundTheme);
+
         logger.log(Priority.INFO,"Updated Theme for id: "+themeId);
         return ResponseEntity.ok().body(ThemeDto.fromTheme(updatedTheme));
     }
@@ -224,5 +245,28 @@ public class ThemeRestController {
      * Temporary Testing Method to ensure clean database data.
      * @return
      */
+
+
+
+    @GetMapping(value = "/api/private/users/{username}/connectedthemes")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity getConnectedThemes(@PathVariable String username, HttpServletRequest request){
+        User requestUser = userService.findUserByUsername(username);
+
+        if (!authenticationHelperService.userIsAllowedToAccessResource(request, username)){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        };
+
+        if(requestUser == null){
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+
+        List<ThemeJpa> themeJpas = new ArrayList<>();
+        for(GameSession gameSession : gameSessionService.getUserGameSessions(username)){
+            themeJpas.add(gameSession.getThemeForSession());
+        }
+
+        return ResponseEntity.ok(themeJpas);
+    }
 
 }

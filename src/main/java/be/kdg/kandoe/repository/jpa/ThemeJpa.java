@@ -1,5 +1,6 @@
 package be.kdg.kandoe.repository.jpa;
 
+import be.kdg.kandoe.domain.GameSession;
 import be.kdg.kandoe.domain.theme.SubTheme;
 import be.kdg.kandoe.domain.theme.Theme;
 import be.kdg.kandoe.dto.ThemeDto;
@@ -10,6 +11,7 @@ import javax.persistence.*;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,9 +35,13 @@ import java.util.stream.Collectors;
         @OneToMany(targetEntity=SubThemeJpa.class,fetch = FetchType.EAGER,mappedBy = "theme",cascade = CascadeType.REMOVE)
         @OnDelete(action = OnDeleteAction.CASCADE)
         @Fetch(FetchMode.SELECT)
-        @JsonIgnore
-        private List<SubThemeJpa> subThemes;
+//        @JsonIgnore
+        private List<SubThemeJpa> subThemes = new ArrayList<>();
 
+        @OneToMany(targetEntity = GameSession.class,mappedBy = "themeForSession")
+        @Column
+//        @JsonIgnore
+        private List<GameSession> gameSessions = new ArrayList<>();
 
         public ThemeJpa(){
 
@@ -88,6 +94,15 @@ import java.util.stream.Collectors;
             if(theme.getSubThemes()!=null){
                 jpa.subThemes = theme.getSubThemes().stream().map(st->SubThemeJpa.fromSubTheme(st)).collect(Collectors.toList());
             }
+            jpa.gameSessions = theme.getGameSessions();
             return jpa;
         }
+
+    public void setGameSessions(List<GameSession> gameSessions) {
+        this.gameSessions = gameSessions;
     }
+
+    public void setSubThemes(List<SubThemeJpa> subThemes) {
+        this.subThemes = subThemes;
+    }
+}

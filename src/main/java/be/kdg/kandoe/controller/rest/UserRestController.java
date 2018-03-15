@@ -138,7 +138,7 @@ public class UserRestController {
         requestUser.setDay(changedUser.getDay());
 
         User savedUser = userService.updateUserNoPassword(requestUser);
-        RequestUserDto requestUserDto = new RequestUserDto(savedUser.getUsername(), savedUser.getFirstName(), savedUser.getLastName(), savedUser.getEmail());
+        RequestUserDto requestUserDto = new RequestUserDto(requestUser.getUsername(), requestUser.getFirstName(), requestUser.getLastName(), requestUser.getEmail());
         return ResponseEntity.ok(requestUserDto);
     }
 

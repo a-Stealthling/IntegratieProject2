@@ -4,17 +4,20 @@ import be.kdg.kandoe.domain.GameSession;
 import be.kdg.kandoe.domain.GameSessionRole;
 import be.kdg.kandoe.domain.Notification;
 import be.kdg.kandoe.domain.UserGameSessionInfo;
+import be.kdg.kandoe.domain.theme.SubTheme;
+import be.kdg.kandoe.domain.theme.Theme;
 import be.kdg.kandoe.domain.user.User;
 import be.kdg.kandoe.dto.RequestUserDto;
+import be.kdg.kandoe.dto.ThemeDto;
 import be.kdg.kandoe.dto.gameSession.CreateGameSessionDto;
 import be.kdg.kandoe.dto.gameSession.NotificationDto;
-import be.kdg.kandoe.service.declaration.AuthenticationHelperService;
-import be.kdg.kandoe.service.declaration.GameSessionService;
-import be.kdg.kandoe.service.declaration.StorageService;
-import be.kdg.kandoe.service.declaration.UserService;
+import be.kdg.kandoe.repository.jpa.SubThemeJpa;
+import be.kdg.kandoe.repository.jpa.ThemeJpa;
+import be.kdg.kandoe.service.declaration.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "https://angularkandoe.herokuapp.com")
@@ -33,14 +37,17 @@ public class GameSessionRestController {
 
     private final StorageService storageService;
 
+    private final ThemeService themeService;
+
     private final AuthenticationHelperService authenticationHelperService;
 
     @Autowired
-    public GameSessionRestController(UserService userService, GameSessionService gameSessionService, StorageService storageService, AuthenticationHelperService authenticationHelperService) {
+    public GameSessionRestController(UserService userService, GameSessionService gameSessionService, StorageService storageService, AuthenticationHelperService authenticationHelperService, ThemeService themeService) {
         this.userService = userService;
         this.gameSessionService = gameSessionService;
         this.storageService = storageService;
         this.authenticationHelperService = authenticationHelperService;
+        this.themeService = themeService;
     }
 
 
@@ -84,14 +91,59 @@ public class GameSessionRestController {
         return ResponseEntity.ok(returnGameSessionDtos);
     }
 
-    //CREATE SESSION
+//    //CREATE SESSION
+//    @PostMapping("/api/private/sessions")
+//    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+//    public ResponseEntity createGameSession(@RequestBody CreateGameSessionDto createGameSessionDto){
+//        GameSession gameSession = new GameSession(createGameSessionDto, userService.findUserByUsername(createGameSessionDto.getOrganisator()));
+//        GameSession savedGameSession = gameSessionService.addGameSession(gameSession);
+//        return ResponseEntity.ok(savedGameSession.getGameSessionId());
+//    }
+
+
+
     @PostMapping("/api/private/sessions")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity createGameSession(@RequestBody CreateGameSessionDto createGameSessionDto){
+    public ResponseEntity createGameSessionTest(@RequestBody CreateGameSessionDto createGameSessionDto, HttpServletRequest request){
+
+        Theme theme = new Theme(createGameSessionDto.getthemeForSession());
         GameSession gameSession = new GameSession(createGameSessionDto, userService.findUserByUsername(createGameSessionDto.getOrganisator()));
+
+
+        theme.addGameSession(gameSession);
+
+        for(SubTheme subTheme : theme.getSubThemes()){
+            subTheme.setTheme(theme);
+        }
+
+        ThemeJpa themeJpa = new ThemeJpa(theme);
+        themeJpa.setGameSessions(theme.getGameSessions());
+
+        gameSession.setThemeForSession(themeJpa);
+
+        themeService.addThemeNoConvert(themeJpa);
+
+        for(SubTheme subTheme : theme.getSubThemes()){
+            SubThemeJpa subThemeJpa = new SubThemeJpa();
+
+            subThemeJpa.setSubThemeName(subTheme.getSubThemeName());
+            subThemeJpa.setThemeNoConvert(themeJpa);
+            subThemeJpa.setSubThemeDescription(subTheme.getSubThemeDescription());
+
+            themeService.addSubThemeByIdNoConvert(subThemeJpa, 1l);
+        }
+
+
         GameSession savedGameSession = gameSessionService.addGameSession(gameSession);
         return ResponseEntity.ok(savedGameSession.getGameSessionId());
     }
+
+
+
+
+
+
+
 
     //Update notification settings from a session
     @PostMapping("/api/private/users/{username}/sessions/{id}")
@@ -187,8 +239,23 @@ public class GameSessionRestController {
         }
 
         String organisatorName = gameSession.getHighestAccesLevelModerator();
+        List<String> subOrganisators = gameSession.getAllSubOrganisators();
 
-        if(!authenticationHelperService.userIsAllowedToAccessResource(request, organisatorName)){
+        boolean isOrganistor = authenticationHelperService.userIsAllowedToAccessResource(request, organisatorName);
+        boolean isSubOrganistor = false;
+
+        for(String s : subOrganisators){
+            if (authenticationHelperService.userIsAllowedToAccessResource(request, s)){
+                isSubOrganistor = true;
+                break;
+            }
+        }
+
+//        if(!authenticationHelperService.userIsAllowedToAccessResource(request, organisatorName)){
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//        }
+
+        if(!isOrganistor && !isSubOrganistor){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -202,6 +269,36 @@ public class GameSessionRestController {
 
         return ResponseEntity.ok(savedGameSession.getGameSessionId());
     }
+
+
+
+    @DeleteMapping("/api/private/sessions/{id}/users/{username}/remove")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity removeUserFromGameSession(@PathVariable Long id, @PathVariable String username, HttpServletRequest request){
+        GameSession gameSession = gameSessionService.getGameSessionWithId(id);
+
+        if(gameSession == null ){
+            ResponseEntity.status(HttpStatus.NO_CONTENT);
+        }
+
+        String organisatorName = gameSession.getHighestAccesLevelModerator();
+
+        if(!authenticationHelperService.userIsAllowedToAccessResource(request, organisatorName)){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+//todo
+        User userToRemoveFromSession = userService.findUserByUsername(username);
+
+        if(userToRemoveFromSession == null ){
+            ResponseEntity.status(HttpStatus.NO_CONTENT);
+        }
+
+//        GameSession savedGameSession = gameSessionService.addUserToGameSession(gameSession.getGameSessionId(), userToAddToSession);
+        boolean done = gameSessionService.removeUserFromGameSession(id, userToRemoveFromSession);
+        if(done) return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+    }
+
 
 
     @PostMapping("/api/private/sessions/{id}/users/{username}/upgradeacceslevel")
@@ -248,5 +345,7 @@ public class GameSessionRestController {
 
         return ResponseEntity.ok().build();
     }
+
+
 
 }

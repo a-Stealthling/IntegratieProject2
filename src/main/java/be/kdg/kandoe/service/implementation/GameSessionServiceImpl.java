@@ -50,7 +50,7 @@ public class GameSessionServiceImpl implements GameSessionService{
 
         if (gameSession == null) throw new GameSessionException("Gamesession with " + id + "was not found!");
 
-        return gameSessionRepository.findOne(id);
+        return gameSession;
     }
 
     @Override
@@ -72,6 +72,30 @@ public class GameSessionServiceImpl implements GameSessionService{
         //userService.addUserGameSessionInfo(user.getUserId(), userGameSessionInfo);
         return gameSession;
     }
+
+
+
+    @Override
+    public boolean removeUserFromGameSession(Long id, User user) {
+        if (checkIfGameSessionExists(id)) throw new GameSessionException("Game session with " + id + "was not found!");
+        if (!checkIfUserAlreadyInSession(id, user)) throw new GameSessionException("User is not part of the game session!");
+        boolean done = false;
+        GameSession gameSession = gameSessionRepository.findOne(id);
+
+        for(UserGameSessionInfo userGameSessionInfo : gameSession.getUserGameSessionInfos()){
+            if(userGameSessionInfo.getUser() == user){
+                gameSession.removeUserFromGameSession(userGameSessionInfo);
+                user.removeUserGameSessionInfo(userGameSessionInfo);
+                done = true;
+                break;
+            }
+        }
+        updateGameSession(gameSession);
+        userService.updateUserNoPassword(user);
+        return done;
+    }
+
+
 
     //Returns false when gameSession doesn't exist yet / true if it does
     private boolean checkIfGameSessionExists(Long gameSessionId){

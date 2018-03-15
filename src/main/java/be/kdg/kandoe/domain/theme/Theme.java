@@ -1,5 +1,6 @@
 package be.kdg.kandoe.domain.theme;
 
+import be.kdg.kandoe.domain.GameSession;
 import be.kdg.kandoe.dto.ThemeDto;
 import be.kdg.kandoe.repository.jpa.ThemeJpa;
 
@@ -13,6 +14,7 @@ public class Theme {
     private String name;
     private String description;
     private List<SubTheme> subThemes;
+    private List<GameSession> gameSessions = new ArrayList<>();
 
 
     public Theme(){
@@ -54,5 +56,17 @@ public class Theme {
 
     public void setSubThemes(List<SubTheme> subThemes) {
         this.subThemes = subThemes;
+    }
+
+    public List<GameSession> getGameSessions() {
+        return gameSessions;
+    }
+
+    public void setGameSessions(List<GameSession> gameSessions) {
+        this.gameSessions = gameSessions;
+    }
+
+    public void addGameSession(GameSession gameSession){
+        this.gameSessions.add(gameSession);
     }
 }

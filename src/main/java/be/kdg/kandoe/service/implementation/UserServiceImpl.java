@@ -123,7 +123,7 @@ public class UserServiceImpl implements be.kdg.kandoe.service.declaration.UserSe
         User u = userRepository.findOne(userId);
         checkLogin(userId, oldPassword);
         u.setEncryptedPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(u);
+//        userRepository.save(u);
     }
 
     @Override
