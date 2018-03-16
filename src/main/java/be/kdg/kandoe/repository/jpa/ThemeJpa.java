@@ -105,4 +105,8 @@ import java.util.stream.Collectors;
     public void setSubThemes(List<SubThemeJpa> subThemes) {
         this.subThemes = subThemes;
     }
+
+    public List<SubThemeJpa> getSubThemes() {
+        return subThemes;
+    }
 }

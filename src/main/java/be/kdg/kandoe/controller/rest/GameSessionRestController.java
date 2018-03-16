@@ -251,10 +251,6 @@ public class GameSessionRestController {
             }
         }
 
-//        if(!authenticationHelperService.userIsAllowedToAccessResource(request, organisatorName)){
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-//        }
-
         if(!isOrganistor && !isSubOrganistor){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -282,11 +278,22 @@ public class GameSessionRestController {
         }
 
         String organisatorName = gameSession.getHighestAccesLevelModerator();
+        List<String> subOrganisators = gameSession.getAllSubOrganisators();
 
-        if(!authenticationHelperService.userIsAllowedToAccessResource(request, organisatorName)){
+        boolean isOrganistor = authenticationHelperService.userIsAllowedToAccessResource(request, organisatorName);
+        boolean isSubOrganistor = false;
+
+        for(String s : subOrganisators){
+            if (authenticationHelperService.userIsAllowedToAccessResource(request, s)){
+                isSubOrganistor = true;
+                break;
+            }
+        }
+
+        if(!isOrganistor && !isSubOrganistor){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-//todo
+
         User userToRemoveFromSession = userService.findUserByUsername(username);
 
         if(userToRemoveFromSession == null ){

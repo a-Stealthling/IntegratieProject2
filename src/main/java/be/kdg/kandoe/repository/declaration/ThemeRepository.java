@@ -1,5 +1,7 @@
 package be.kdg.kandoe.repository.declaration;
 
+import be.kdg.kandoe.domain.theme.Card;
+import be.kdg.kandoe.domain.theme.CardSubTheme;
 import be.kdg.kandoe.domain.theme.SubTheme;
 import be.kdg.kandoe.domain.theme.Theme;
 import be.kdg.kandoe.dto.ThemeDto;
@@ -35,4 +37,20 @@ public interface ThemeRepository {
     List<Theme> findAllThemes();
     List<SubTheme> findAllSubThemes();
     List<SubTheme> findSubThemesByThemeId(long id);
+
+
+
+    List<Card> findCardsBySubthemeId(long subthemeId);
+
+    Card findCardById(long cardId);
+
+    Card createCard(Card card);
+
+    CardSubTheme createCardSubTheme(CardSubTheme cardSubTheme);
+
+    Card delete(Card card);
+
+    Card editCard(Card cardToAdd);
+
+    List<Card> findAllCards();
 }

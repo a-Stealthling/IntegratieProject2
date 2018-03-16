@@ -2,12 +2,13 @@ package be.kdg.kandoe.repository.jpa;
 
 import be.kdg.kandoe.domain.theme.SubTheme;
 import be.kdg.kandoe.domain.theme.Theme;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.Generated;
-import org.hibernate.annotations.GenerationTime;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import java.util.List;
 
 @Entity
 @Table(name="SUBTHEME")
@@ -28,6 +29,12 @@ public class SubThemeJpa {
 
     @Column
     private String subThemeDescription;
+
+
+    @Column
+    @OneToMany(targetEntity = CardSubThemeJpa.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "subTheme")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private List<CardSubThemeJpa> cardSubThemes;
 
     public SubThemeJpa(){
 
@@ -89,5 +96,21 @@ public class SubThemeJpa {
         subTheme.setSubThemeName(this.subThemeName);
         subTheme.setSubThemeDescription(this.subThemeDescription);
         return subTheme;
+    }
+
+    public void setSubThemeId(long subThemeId) {
+        this.subThemeId = subThemeId;
+    }
+
+    public void setTheme(ThemeJpa theme) {
+        this.theme = theme;
+    }
+
+    public List<CardSubThemeJpa> getCardSubThemes() {
+        return cardSubThemes;
+    }
+
+    public void setCardSubThemes(List<CardSubThemeJpa> cardSubThemes) {
+        this.cardSubThemes = cardSubThemes;
     }
 }
