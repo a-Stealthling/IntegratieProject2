@@ -357,4 +357,51 @@ public class GameSessionRestController {
 
 
 
+    @PostMapping("/api/private/sessions/{id}/users/{username}/downgradeacceslevel")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity downgradeGameSessionRoleOfAUser(@PathVariable Long id, @PathVariable String username, HttpServletRequest request){
+        GameSession gameSession = gameSessionService.getGameSessionWithId(id);
+
+
+        //GameSessionId bestaat die?
+        ///Username in de token --> Is de user die de request maakt een Moderator of ModeratorParticipant anders unauthorized
+        //Username (vd user om rechten af te nemen ) bestaat die en is die nog geen Moderator, ModeratorParticipant
+
+        if(gameSession == null ){
+            ResponseEntity.status(HttpStatus.NO_CONTENT).body("Gamesession was not found!");
+        }
+
+        String tokenUsername = (String) request.getAttribute("username");
+
+        //Role of the user from the token
+        GameSessionRole role = gameSession.getRoleOfUser(tokenUsername);
+
+        if(role == null){
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User that made the request is not part of this game session!");
+        }
+
+        if(role != GameSessionRole.Moderator && role != GameSessionRole.ModeratorParticipant){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User doesn't have the right permissions to lower the access level to a user");
+        }
+
+        //Role of the user that needs to be granted a higher acces level
+        GameSessionRole gameSessionRole = gameSession.getRoleOfUser(username);
+
+        if(gameSessionRole == null){
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("The user that needs to be given a lower acces level is not part of the game session");
+        }
+
+        if(gameSessionRole == GameSessionRole.ModeratorParticipant || gameSessionRole == GameSessionRole.Moderator){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Can't downgrade a moderator!");
+        }
+
+        gameSession.setRoleOfUser(username, GameSessionRole.Participant);
+
+        gameSessionService.updateGameSession(gameSession);
+
+        return ResponseEntity.ok().build();
+    }
+
+
+
 }
