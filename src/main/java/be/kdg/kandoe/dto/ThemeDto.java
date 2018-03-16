@@ -1,12 +1,8 @@
 package be.kdg.kandoe.dto;
 
-import be.kdg.kandoe.domain.theme.SubTheme;
 import be.kdg.kandoe.domain.theme.Theme;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import org.hibernate.annotations.Cascade;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -82,7 +78,7 @@ public class ThemeDto {
     public static ThemeDto fromTheme(Theme theme){
         ThemeDto newThemeDto =  new ThemeDto(theme.getThemeId(),theme.getName(),theme.getDescription());
         if(theme.getSubThemes()!=null){
-            newThemeDto.setSubThemes(theme.getSubThemes().stream().map(st->SubThemeDto.fromSubTheme(st)).collect(Collectors.toList()));
+            newThemeDto.setSubThemes(theme.getSubThemes().stream().map(st-> SubThemeDto.fromSubTheme(st)).collect(Collectors.toList()));
         }
         return newThemeDto;
     }

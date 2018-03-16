@@ -1,14 +1,11 @@
 package be.kdg.kandoe.repository.jpa;
 
 import be.kdg.kandoe.domain.GameSession;
-import be.kdg.kandoe.domain.theme.SubTheme;
 import be.kdg.kandoe.domain.theme.Theme;
-import be.kdg.kandoe.dto.ThemeDto;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.*;
 
-import javax.persistence.*;
 import javax.persistence.CascadeType;
+import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.util.ArrayList;
@@ -104,9 +101,5 @@ import java.util.stream.Collectors;
 
     public void setSubThemes(List<SubThemeJpa> subThemes) {
         this.subThemes = subThemes;
-    }
-
-    public List<SubThemeJpa> getSubThemes() {
-        return subThemes;
     }
 }

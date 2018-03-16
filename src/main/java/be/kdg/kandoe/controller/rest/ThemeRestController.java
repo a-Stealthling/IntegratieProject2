@@ -7,27 +7,22 @@ import be.kdg.kandoe.domain.user.User;
 import be.kdg.kandoe.dto.DtoConverter;
 import be.kdg.kandoe.dto.SubThemeDto;
 import be.kdg.kandoe.dto.ThemeDto;
-import be.kdg.kandoe.repository.implementation.ThemeRepositoryImpl;
 import be.kdg.kandoe.repository.jpa.ThemeJpa;
 import be.kdg.kandoe.service.declaration.AuthenticationHelperService;
 import be.kdg.kandoe.service.declaration.GameSessionService;
 import be.kdg.kandoe.service.declaration.ThemeService;
 import be.kdg.kandoe.service.declaration.UserService;
 import be.kdg.kandoe.service.exception.ThemeServiceException;
-import be.kdg.kandoe.service.implementation.ThemeServiceImpl;
-import com.sun.org.apache.regexp.internal.RE;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.xml.ws.Response;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -80,7 +75,7 @@ public class ThemeRestController {
     public ResponseEntity<List<SubThemeDto>> getAllSubThemes(){
         System.out.println("CALL RECEIVED: getAllSubThemes");
         List<SubTheme> subThemes = themeService.getAllSubThemes();
-        return ResponseEntity.ok().body(subThemes.stream().map(st->SubThemeDto.fromSubTheme(st)).collect(Collectors.toList()));
+        return ResponseEntity.ok().body(subThemes.stream().map(st-> SubThemeDto.fromSubTheme(st)).collect(Collectors.toList()));
     }
 
     @RequestMapping(value= "api/public/theme", method = RequestMethod.GET)
@@ -114,7 +109,7 @@ public class ThemeRestController {
         if(subThemes==null){
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok().body(subThemes.stream().map(s->SubThemeDto.fromSubTheme(s)).collect(Collectors.toList()));
+        return ResponseEntity.ok().body(subThemes.stream().map(s-> SubThemeDto.fromSubTheme(s)).collect(Collectors.toList()));
     }
 
     //GET-METHODS
@@ -136,7 +131,7 @@ public class ThemeRestController {
 
     @RequestMapping(value = "api/public/subthemes/{themeId}",method = RequestMethod.POST)
 //    @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<SubThemeDto> CreateSubTheme(@Valid @RequestBody SubThemeDto subThemeDto,@PathVariable(name = "themeId") Long themeId){
+    public ResponseEntity<SubThemeDto> CreateSubTheme(@Valid @RequestBody SubThemeDto subThemeDto, @PathVariable(name = "themeId") Long themeId){
         if(themeId==new Long(0)){
             themeId=null;
         }
@@ -238,7 +233,7 @@ public class ThemeRestController {
         }catch (ThemeServiceException tse){
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok().body(deletedSubThemes.stream().map(st->SubThemeDto.fromSubTheme(st)).collect(Collectors.toList()));
+        return ResponseEntity.ok().body(deletedSubThemes.stream().map(st-> SubThemeDto.fromSubTheme(st)).collect(Collectors.toList()));
     }
     //DELETE-METHODS
     /**

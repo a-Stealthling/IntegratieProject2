@@ -1,8 +1,6 @@
 package be.kdg.kandoe.dto.gameSession;
 
-import be.kdg.kandoe.domain.GameSession;
 import be.kdg.kandoe.dto.ThemeDto;
-import be.kdg.kandoe.repository.jpa.ThemeJpa;
 
 import java.util.List;
 

@@ -1,7 +1,6 @@
 package be.kdg.kandoe.service.implementation;
 
 import be.kdg.kandoe.domain.GameSession;
-import be.kdg.kandoe.domain.GameSessionRole;
 import be.kdg.kandoe.domain.UserGameSessionInfo;
 import be.kdg.kandoe.domain.user.User;
 import be.kdg.kandoe.repository.declaration.GameSessionRepository;

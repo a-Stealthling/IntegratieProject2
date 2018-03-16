@@ -2,9 +2,7 @@ package be.kdg.kandoe.domain.theme;
 
 import be.kdg.kandoe.domain.GameSession;
 import be.kdg.kandoe.dto.ThemeDto;
-import be.kdg.kandoe.repository.jpa.ThemeJpa;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

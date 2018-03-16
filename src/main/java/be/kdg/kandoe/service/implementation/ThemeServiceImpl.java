@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -42,7 +41,7 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
-    public SubTheme addSubThemeByThemeId(SubTheme subTheme,long themeId) {
+    public SubTheme addSubThemeByThemeId(SubTheme subTheme, long themeId) {
         Theme themeToAdd=themeRepo.findThemeById(themeId);
         subTheme.setTheme(themeToAdd);
         return themeRepo.createSubTheme(subTheme);

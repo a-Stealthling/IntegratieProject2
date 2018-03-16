@@ -1,13 +1,10 @@
 package be.kdg.kandoe.repository.implementation;
 
-import be.kdg.kandoe.domain.theme.Card;
 import be.kdg.kandoe.domain.theme.SubTheme;
 import be.kdg.kandoe.domain.theme.Theme;
 import be.kdg.kandoe.repository.declaration.ThemeRepository;
 import be.kdg.kandoe.repository.jpa.SubThemeJpa;
 import be.kdg.kandoe.repository.jpa.ThemeJpa;
-import be.kdg.kandoe.service.exception.ThemeRepositoryException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -164,68 +161,5 @@ public class ThemeRepositoryImpl implements ThemeRepository {
     public List<SubTheme> findSubThemesByThemeId(long id){
         throw new NotImplementedException();
     }
-
-
-
-
-    @Override
-    @Transactional
-    public List<Card> findCardsBySubthemeId(long subthemeId) {
-        TypedQuery<CardSubThemeJpa> q = em.createQuery("SELECT card FROM CardSubThemeJpa card WHERE card.subTheme.subThemeId=:subThemeId", CardSubThemeJpa.class).setParameter("subThemeId", subthemeId);
-        if (q.getResultList().isEmpty()) {
-            throw new ThemeRepositoryException("No Cards found for SubTheme with ID: " + subthemeId);
-        }
-        List<Card> cards = new ArrayList<>();
-        for (CardSubThemeJpa jpa : q.getResultList()) {
-            cards.add(JpaConverter.toCard(jpa.getCard(), false));
-        }
-        return cards;
-    }
-
-    @Override
-    @Transactional
-    public CardSubTheme createCardSubTheme(CardSubTheme cst) {
-        CardSubThemeJpa jpa = JpaConverter.toCardSubThemeJpa(cst);
-        CardSubThemeJpa result = em.merge(jpa);
-        return JpaConverter.toCardSubTheme(result);
-    }
-
-    @Override
-    @Transactional
-    public List<Card> findAllCards() {
-        TypedQuery<CardJpa> query = em.createQuery("SELECT card FROM CardJpa card", CardJpa.class);
-        if (query.getResultList().isEmpty()) {
-            throw new ThemeRepositoryException("No cards found");
-        }
-        return query.getResultList().stream().map(c -> JpaConverter.toCard(c, false)).collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional
-    public Card findCardById(@Param("cardId") long cardId) {
-        TypedQuery<CardJpa> q = em.createQuery("SELECT c from CardJpa c where c.cardId = :cardId", CardJpa.class);
-        q.setParameter("cardId", cardId);
-        if (q.getResultList().isEmpty()) {
-            throw new ThemeRepositoryException("No Card found for ID: " + cardId);
-        }
-        return JpaConverter.toCard(q.getSingleResult(), false);
-    }
-
-    @Override
-    @Transactional
-    public Card createCard(Card card) {
-        CardJpa jpa = JpaConverter.toCardJpa(card, false);
-        em.persist(jpa);
-        return JpaConverter.toCard(jpa, false);
-    }
-
-    @Override
-    @Transactional
-    public Card delete(Card card) {
-        CardJpa jpa = JpaConverter.toCardJpa(card, false);
-        em.remove(em.contains(jpa) ? jpa : em.merge(jpa));
-        return JpaConverter.toCard(jpa, false);
-    }
-
 }
 

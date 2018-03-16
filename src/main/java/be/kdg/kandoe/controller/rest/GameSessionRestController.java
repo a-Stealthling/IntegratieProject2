@@ -8,7 +8,6 @@ import be.kdg.kandoe.domain.theme.SubTheme;
 import be.kdg.kandoe.domain.theme.Theme;
 import be.kdg.kandoe.domain.user.User;
 import be.kdg.kandoe.dto.RequestUserDto;
-import be.kdg.kandoe.dto.ThemeDto;
 import be.kdg.kandoe.dto.gameSession.CreateGameSessionDto;
 import be.kdg.kandoe.dto.gameSession.NotificationDto;
 import be.kdg.kandoe.repository.jpa.SubThemeJpa;
@@ -17,7 +16,6 @@ import be.kdg.kandoe.service.declaration.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "https://angularkandoe.herokuapp.com")
@@ -251,6 +248,10 @@ public class GameSessionRestController {
             }
         }
 
+//        if(!authenticationHelperService.userIsAllowedToAccessResource(request, organisatorName)){
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//        }
+
         if(!isOrganistor && !isSubOrganistor){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -305,6 +306,7 @@ public class GameSessionRestController {
         if(done) return ResponseEntity.ok().build();
         return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
     }
+
 
 
 
